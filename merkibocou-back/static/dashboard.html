@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>MerkitBocou Dashboard</title>
+        <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.min.js"></script>
+        <style>
+/* Global Styles */
+body {
+    font-family: "Nunito Sans", sans-serif;
+    background: linear-gradient(180deg, #fff8dc, #fff4e6);
+    color: #4b0082;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Headers */
+h1, h2, h6 {
+    font-family: "Chewy", cursive;
+    margin-bottom: 10px;
+    color: #ff6f61;
+}
+
+h1 {
+    font-size: 2.8rem;
+    text-align: center;
+    margin-top: 20px;
+}
+
+h2 {
+    font-size: 2rem;
+    color: #4b0082;
+}
+
+h6 {
+    font-size: 1.2rem;
+    color: #333;
+}
+
+
+/* Buttons */
+.btn-primary {
+    font-family: "Nunito Sans", sans-serif;
+    background-color: #ff6f61;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    background-color: #d65550;
+}
+
+.btn-success {
+    background-color: #a8e6cf;
+    color: #4b0082;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.btn-success:hover {
+    background-color: #88d0b5;
+    transform: scale(1.05);
+}
+
+.btn-secondary {
+    border-radius: 8px;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+
+}
+
+.btn-secondary:hover {
+    transform: scale(1.05);
+}
+
+/* Cards */
+.card {
+    border-radius: 12px;
+    background-color: #ffffff;
+    border: 2px solid #ffcccb;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    padding: 15px;
+}
+
+.card:hover {
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card-title {
+    font-family: "Chewy", cursive;
+    font-size: 1.6rem;
+    color: #ff6f61;
+}
+
+/* Toast Notifications */
+
+.toast-container {
+    position: fixed;
+    top: 1rem; /* Place les toasts en haut */
+    right: 1rem; /* Aligne les toasts à droite */
+    z-index: 1050; /* S'assure qu'ils sont au-dessus des autres éléments */
+    display: flex;
+    flex-direction: column; /* Empile les toasts verticalement */
+    gap: 0.5rem; /* Espace entre chaque toast */
+}
+
+.toast {
+    background: linear-gradient(to right, #ffcccb, #fff8dc);
+    border: 0;
+    border-radius: 10px;
+    padding: 15px;
+    color: #4b0082;
+    font-family: "Nunito Sans", sans-serif;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.toast.success {
+    background: linear-gradient(to right, #a8e6cf, #fff8dc);
+}
+
+.toast.error {
+    background: linear-gradient(to right, #fec89a, #fff8dc);
+}
+
+/* Lists */
+.detail-list {
+    background-color: #fff4e6;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 10px;
+    list-style-type: none;
+}
+
+.detail-item {
+    font-family: "Nunito Sans", sans-serif;
+    color: #4b0082;
+    font-size: 0.9rem;
+    padding: 10px 15px;
+    background: #ffffff;
+    border: 1px solid #ffcccb;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.detail-item:hover {
+    background: #fef6e4;
+}
+
+.detail-thankyou {
+    flex-direction: row;
+    gap: 2rem;
+    margin-bottom: 4px;
+}
+
+.detail-thankyou p {
+    margin-bottom: 0;
+}
+
+.detail-thankyou .click-nb {
+    width: 5ex;
+    display: inline-block;
+}
+
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-item .detail-main {
+    white-space: pre-wrap; /* Respecte les sauts de ligne et espaces */
+    word-wrap: break-word; /* Coupe les mots trop longs */
+
+}
+        </style>
+    </head>
+    <body>
+        <div id="app">
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+                    <div class="collapse navbar-collapse">
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item" v-if="isLoggedIn">
+                                <span class="nav-link">Hello{{ loginForm.username? ', ' + loginForm.username : '' }}!</span>
+                            </li>
+                            <li class="nav-item" v-if="isLoggedIn">
+                                <a class="nav-link" href="#" @click="logout">Logout</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <h1 class="text-center mb-4">Welcome to MerkitBocou</h1>
+
+            <!-- Toast Notifications -->
+            <div class="toast-container">
+                <div v-for="toast in toasts" :key="toast.id" class="toast show" :class="toast.type">
+                    <div class="toast-body">{{ toast.message }}</div>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <section v-if="!isLoggedIn" class="mt-4 container">
+                <h2>Login</h2>
+                <form @submit.prevent="login" class="mb-3">
+                    <div class="mb-3">
+                        <label for="login-username" class="form-label">Username</label>
+                        <input type="text" v-model="loginForm.username" id="login-username" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="login-password" class="form-label">Password</label>
+                        <input type="password" v-model="loginForm.password" id="login-password" class="form-control" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+            </section>
+
+            <!-- Projects Section -->
+            <section v-if="isLoggedIn" class="mt-4 container">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Your Projects</h2>
+                    <div class="projects-header-btn-container">
+                        <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+                            + Create Project
+                        </button>
+                        <button class="btn btn-secondary" @click="loadProjects()">Reload</button>
+                    </div>
+                </div>
+
+                <div id="projects-container" class="row">
+                    <div
+                        v-for="project in projects"
+                        :key="project.id"
+                        class="card shadow-sm mb-2 me-4"
+                        :class="{ 'detailed-card': project.id === detailedProject?.id }"
+                    >
+                        <div class="card-body">
+                            <h5 class="card-title">{{ project.name }} <small>id: {{ project.dev_id }}</small></h5>
+                            <p class="card-text">
+                                <strong>💌 Mercis reçus :</strong> {{ project.totalClicks }}<br />
+                                <strong>📝 Dernier message :</strong> {{ truncate(project.lastMessage?.content) || 'Aucun message pour l\'instant' }}
+                            </p>
+                            <button
+                                v-if="project.id !== detailedProject?.id"
+                                @click="loadDetails(project.id)"
+                                class="btn btn-primary btn-sm"
+                            >
+                                Voir les détails
+                            </button>
+                            <button v-else @click="closeDetails" class="btn btn-secondary btn-sm">Fermer les détails</button>
+
+                            <!-- Détails du projet -->
+                            <div v-if="project.id === detailedProject?.id" class="mt-4">
+                                <h6 class="mt-3">📩 Derniers messages :</h6>
+                                <ul class="detail-list">
+                                    <li
+                                        class="detail-item message-item"
+                                        v-for="message in detailedProject.recentMessages"
+                                        :key="message.timestamp"
+                                    >
+                                        <p class="detail-main">{{ message.message }}</p>
+                                        <p class="detail-meta">
+                                            👤 User : {{ message.userId }} | 📅 Date : {{ new Date(message.timestamp).toLocaleString() }}
+                                        </p>
+                                    </li>
+                                </ul>
+                                <h6>🕵️ Derniers mercis :</h6>
+                                <ul class="detail-list">
+                                    <li class="detail-item detail-thankyou" v-for="click in detailedProject.recentClicks" :key="click.timestamp">
+                                        <p class="detail-main"><strong>🔢 Nombre&nbsp;:</strong>&nbsp;<span class="click-nb">{{ click.clicks }}</span></p>
+                                        <p class="detail-meta">
+                                            👤 User : {{ click.userId }} | 📅 Date&nbsp;: {{ new Date(click.timestamp).toLocaleString() }}
+                                        </p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Create Project Modal -->
+            <div class="modal fade" id="createProjectModal" tabindex="-1" aria-labelledby="createProjectModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="createProjectModalLabel">Create New Project</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form @submit.prevent="createProject">
+                                <div class="mb-3">
+                                    <label for="project-name" class="form-label">Project Name</label>
+                                    <input type="text" v-model="newProjectName" id="project-name" class="form-control" required />
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Create Project</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const apiBaseUrl = "";
+
+            const app = Vue.createApp({
+                data() {
+                    return {
+                        isLoggedIn: false,
+                        loginForm: { username: "", password: "" },
+                        projects: [],
+                        newProjectName: "",
+                        detailedProject: null,
+                        toasts: [],
+                    };
+                },
+                methods: {
+                    async apiFetch(endpoint, options = {}) {
+                        const token = localStorage.getItem("access_token");
+                        const headers = {
+                            "Content-Type": "application/json",
+                            ...options.headers,
+                        };
+
+                        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+                        try {
+                            const response = await fetch(`${apiBaseUrl}${endpoint}`, { ...options, headers });
+                            if (response.status === 401) {
+                                this.logout();
+                                this.showToast("Session expired. Please log in again.", "error");
+                                throw new Error("Unauthorized");
+                            }
+                            if (!response.ok) {
+                                const errorData = await response.json();
+                                throw new Error(errorData.detail || "An error occurred.");
+                            }
+                            return await response.json();
+                        } catch (error) {
+                            this.showToast(error.message, "error");
+                            throw error;
+                        }
+                    },
+                    truncate(text, length = 100) {
+                        if (!text) return "";
+                        return text.length > length ? text.substring(0, length) + "..." : text;
+                    },
+                    async login() {
+                        try {
+                            const data = await this.apiFetch("/developers/login/", {
+                                method: "POST",
+                                body: JSON.stringify(this.loginForm),
+                            });
+                            localStorage.setItem("access_token", data.access_token);
+                            this.isLoggedIn = true;
+                            this.loadProjects();
+                            this.showToast("Login successful!", "success");
+                        } catch {}
+                    },
+                    async loadProjects() {
+                        try {
+                            this.projects = await this.apiFetch("/projects/summary/");
+                        } catch {}
+                        this.showToast("Projects loaded!", "success");
+                    },
+                    async createProject() {
+                        try {
+                            await this.apiFetch("/projects/", {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    name: this.newProjectName,
+                                }),
+                            });
+                            this.loadProjects();
+                            this.newProjectName = "";
+                            this.showToast("Project created successfully!", "success");
+                        } catch {}
+                    },
+                    async loadDetails(projectId) {
+                        try {
+                            this.detailedProject = await this.apiFetch(`/projects/${projectId}/details/`);
+                        } catch (error) {
+                            this.showToast(error.message, "error");
+                        }
+                    },
+                    closeDetails() {
+                        this.detailedProject = null;
+                    },
+                    logout() {
+                        localStorage.removeItem("access_token");
+                        this.isLoggedIn = false;
+                        this.projects = [];
+                        this.newProjectName = "";
+                        this.detailedProject = null;
+                        this.showToast("You have been logged out.", "success");
+                    },
+                    showToast(message, type = "error") {
+                        const id = Date.now();
+                        this.toasts.push({ id, message, type });
+                        setTimeout(() => {
+                            this.toasts = this.toasts.filter((toast) => toast.id !== id);
+                        }, 3000);
+                    },
+                },
+                mounted() {
+                    const token = localStorage.getItem("access_token");
+                    if (token) {
+                        this.isLoggedIn = true;
+                        this.loadProjects();
+                    }
+                },
+            });
+
+            app.mount("#app");
+        </script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+            defer
+            crossorigin="anonymous"
+        ></script>
+    </body>
+</html>

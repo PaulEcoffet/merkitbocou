@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page MerkitBocou</title>
+  <script src="merkibocou/merkibocou.js" defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #thank-you-container, #message-container {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bienvenue sur la page MerkitBocou</h1>
+  <p>Cliquez sur les boutons pour envoyer des messages ou des remerciements.</p>
+
+  <!-- Conteneur pour le bouton Thank You -->
+  <div id="thank-you-container"></div>
+
+  <!-- Conteneur pour le bouton Message -->
+  <div id="message-container"></div>
+
+  <script type="text/javascript" defer>
+  window.addEventListener("merkitbocou-ready", () => {
+    // Initialisation du bouton Thank You
+    new ThankYouButton({
+      selector: '#thank-you-container',
+      emoji: '❤️',
+      devId: 1,
+      apiUrl: '/thank-you',
+      projectName: 'kikou',
+    });
+
+    // Initialisation du bouton Message
+    new ThankYouMessageButton({
+      selector: '#message-container',
+      apiUrl: '/send-message',
+      devId: 1,
+      projectName: 'kikou',
+      placeholder: 'Écrivez-moi un petit mot! N’hésitez pas à me dire d’où vous m’écrivez, et à me laisser vos coordonnées pour vous recontacter.',
+    });
+  });
+  </script>
+</body>
+</html>

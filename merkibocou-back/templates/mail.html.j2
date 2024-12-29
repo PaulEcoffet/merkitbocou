@@ -1,0 +1,34 @@
+  <div class="email-container" style="font-family: &quot;Nunito Sans&quot;, Arial, sans-serif;background-color: #fff8dc;color: #4b0082;margin: 0;padding: 0;line-height: 1.6;max-width: 600px;margin: 0 auto;background: #ffffff;border: 1px solid #ffcccb;border-radius: 8px;padding: 20px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h1 style="font-family: &quot;Chewy&quot;, cursive, Arial, sans-serif;color: #ff6f61;">Bilan MerkitBocou de {{ username }}</h1>
+    <p style="margin: 0 0 1rem;">Voilà ton bilan de la semaine :)</p>
+    {% for project in projects %}
+    <div class="project" style="margin-bottom: 20px;padding: 15px;border: 1px solid #ffcccb;border-radius: 8px;background: #fff4e6;">
+      <h2 style="font-family: &quot;Chewy&quot;, cursive, Arial, sans-serif;color: #ff6f61;margin-bottom: 10px;">{{ project.name }}</h2>
+      {% if project.recent_messages %}
+      <h3 style="font-family: &quot;Chewy&quot;, cursive, Arial, sans-serif;color: #ff6f61;">Derniers messages :</h3>
+      {% for message in project.recent_messages %}
+      <p class="message" style="margin: 0; padding: 15px; background-color: #ffffff; border-radius: 4px;">
+        <strong>Message :</strong><br>{{ message.content }}
+      </p>
+      <p style="margin-top: 0; margin-bottom: 20px; color: #aaa">
+        Par : {{ message.user_id }}, le : {{ message.timestamp }}
+      </p>
+      {% endfor %}
+      {% endif %}
+      {% if project.recent_clicks %}
+      <h3 style="font-family: &quot;Chewy&quot;, cursive, Arial, sans-serif;color: #ff6f61;">Derniers Mercis :</h3>
+      <ul style="margin: 0 0 1rem;">
+      {% for thankyou in project.recent_clicks %}
+        <li class="thankyou" style="margin: 0 0 10px;">
+          <strong>{{ thankyou.count }} Mercis</strong> par {{ thankyou.user_id }} le {{ thankyou.timestamp }}
+        </li>
+      {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <p style="margin: 0 0 1rem;">Et voilà c’est tout! Gros bisous et à bientôt!</p>
+    <div class="footer" style="text-align: center;font-size: 0.9rem;color: #666;margin-top: 20px;">
+      2024 MerkitBocou par <em>peco</em>
+    </div>
+  </div>
