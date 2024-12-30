@@ -212,7 +212,7 @@ h6 {
                     <div class="collapse navbar-collapse">
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item" v-if="isLoggedIn">
-                                <span class="nav-link">Hello{{ loginForm.username? ', ' + loginForm.username : '' }}!</span>
+                                <span class="nav-link">Hello{{ dev.username ? ', ' + dev.username : '' }}!</span>
                             </li>
                             <li class="nav-item" v-if="isLoggedIn">
                                 <a class="nav-link" href="#" @click="logout">Logout</a>
@@ -255,7 +255,7 @@ h6 {
                         <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#createProjectModal">
                             + Create Project
                         </button>
-                        <button class="btn btn-secondary" @click="loadProjects()">Reload</button>
+                        <button class="btn btn-secondary" @click="loadProjects(); loadDeveloper();">Reload</button>
                     </div>
                 </div>
 
@@ -345,6 +345,7 @@ h6 {
                         newProjectName: "",
                         detailedProject: null,
                         toasts: [],
+                        dev: {}
                     };
                 },
                 methods: {
@@ -386,6 +387,7 @@ h6 {
                             });
                             localStorage.setItem("access_token", data.access_token);
                             this.isLoggedIn = true;
+                            this.loadDeveloper();
                             this.loadProjects();
                             this.showToast("Login successful!", "success");
                         } catch {}
@@ -394,7 +396,13 @@ h6 {
                         try {
                             this.projects = await this.apiFetch("/projects/summary/");
                         } catch {}
-                        this.showToast("Projects loaded!", "success");
+                    },
+                    async loadDeveloper() {
+                        try {
+                            this.dev = await this.apiFetch("/developers/me");
+                            console.log(this.dev)
+
+                        } catch {}
                     },
                     async createProject() {
                         try {
@@ -404,6 +412,7 @@ h6 {
                                     name: this.newProjectName,
                                 }),
                             });
+                            this.loadDeveloper();
                             this.loadProjects();
                             this.newProjectName = "";
                             this.showToast("Project created successfully!", "success");
@@ -423,6 +432,7 @@ h6 {
                         localStorage.removeItem("access_token");
                         this.isLoggedIn = false;
                         this.projects = [];
+                        this.dev = {};
                         this.newProjectName = "";
                         this.detailedProject = null;
                         this.showToast("You have been logged out.", "success");
@@ -439,7 +449,9 @@ h6 {
                     const token = localStorage.getItem("access_token");
                     if (token) {
                         this.isLoggedIn = true;
+                        this.loadDeveloper();
                         this.loadProjects();
+
                     }
                 },
             });

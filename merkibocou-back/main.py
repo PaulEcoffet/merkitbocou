@@ -1,3 +1,4 @@
+import html
 import logging
 from typing import List, Annotated
 
@@ -13,10 +14,10 @@ from config import settings
 
 from crud import crud
 from database import AsyncSessionLocal, engine, Base
-from schemas.schemas import DeveloperCreate, DeveloperResponse, DeveloperUpdatePreference, ProjectSummaryResponse, \
+from schemas.schemas import DeveloperCreate, DeveloperDetailedResponse, DeveloperResponse, DeveloperUpdatePreference, ProjectSummaryResponse, \
     ProjectResponse, ProjectDetailsResponse, MessageCreate, ProjectCreate, MessageOut, ThankYouClickCreate, ThankYouOut, \
     DeveloperLogin
-from services.mailing import send_summary_mail_to_all
+from services.mailing import mail_message_to_dev, send_instant_thank_you_notification, send_summary_mail_to_all
 
 app = FastAPI()
 
@@ -62,6 +63,12 @@ async def register_developer(developer: DeveloperCreate, db: AsyncSession = Depe
 
     return await crud.create_developer(db, developer)
 
+
+@app.get("/developers/me")
+async def get_current_dev(user=Depends(auth), db=Depends(get_db)):
+    dev_id = user['id']
+    dev = await crud.get_developer_by_id(db, dev_id)
+    return dev
 
 @app.post("/developers/login/")
 async def login_developer(developer: DeveloperLogin, db: AsyncSession = Depends(get_db)):
@@ -189,27 +196,59 @@ async def project_details(
 
 # THANK YOU
 @app.post("/thank-you/")
-async def thank_you(click: ThankYouClickCreate, db: AsyncSession = Depends(get_db)):
+async def thank_you(click: ThankYouClickCreate, bg_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
     """
     Route pour enregistrer un clic sur un projet.
     """
     try:
-        return await crud.create_thank_you_click(db=db, click=click)
+        click_out = await crud.create_thank_you_click(db=db, click=click)
+        bg_tasks.add_task(send_instant_thank_you_notification, db, click)
+        return click_out
     except NoResultFound:
         raise HTTPException(status_code=404, detail=f"Le projet {click.project_name} n'existe pas.")
-
+    
 
 # MESSAGES
 @app.post("/send-message/")
-async def send_message(message: MessageCreate, db: AsyncSession = Depends(get_db)):
+async def send_message(message: MessageCreate, bg_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
     """
     Route pour envoyer un message à un projet.
     """
+    message.content = clean_html(message.content)  # clean < & > to &lt; etc, nl 2 br, and double space to "&nbsp; "
     try:
-        return await crud.create_message(db=db, message=message)
+        message_out = await crud.create_message(db=db, message=message)
     except NoResultFound:
         raise HTTPException(status_code=404, detail=f"Le projet {message.project_name} n'existe pas.")
+    bg_tasks.add_task(send_instant_message_notification, db, message)
+    return message_out
 
+async def send_instant_message_notification(db, message: MessageCreate):
+    dev: DeveloperDetailedResponse = await crud.get_developer_by_id(db, message.dev_id)
+    if (dev.instant_messages):
+        await mail_message_to_dev(message, dev)
+
+def clean_html(content: str) -> str:
+    """
+    Nettoie le contenu HTML pour éviter les problèmes de sécurité
+    et maintenir une présentation correcte.
+    
+    - Échappe les balises HTML (<, >, etc.).
+    - Remplace les sauts de ligne (\n) par des <br>.
+    - Remplace les doubles espaces par des espaces insécables (&nbsp;).
+    
+    Args:
+        content (str): Le contenu brut à nettoyer.
+    
+    Returns:
+        str: Le contenu nettoyé.
+    """
+    # Échapper les caractères HTML sensibles
+    escaped_content = html.escape(content)
+    # Remplacer les sauts de ligne par des <br>
+    escaped_content = escaped_content.replace("\n", "<br>")
+    # Remplacer les doubles espaces par &nbsp;
+    escaped_content = escaped_content.replace("  ", "&nbsp; ")
+    return escaped_content
 
 #### CRON OPERATION
 

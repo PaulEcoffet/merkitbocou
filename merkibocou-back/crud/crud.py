@@ -15,7 +15,8 @@ from models.messages import Message
 from models.developers import Developer
 from models.thank_you_clicks import ThankYouClick
 from schemas import schemas
-from schemas.schemas import ThankYouOut, MessageOut, ProjectMailSummary, DeveloperMailSummaryResponse
+from schemas.schemas import ThankYouOut, MessageOut, ProjectMailSummary, DeveloperMailSummaryResponse, ProjectResponse, \
+    DeveloperDetailedResponse
 
 
 # ---- DEVELOPERS ----
@@ -50,6 +51,16 @@ async def get_developer_by_username(db: AsyncSession, username: str):
     result = await db.execute(select(Developer).filter(Developer.username == username))
     return result.scalars().first()
 
+async def get_developer_by_id(db: AsyncSession, id: int) -> DeveloperDetailedResponse:
+    """
+    Récupère un développeur par son nom d'utilisateur.
+    """
+    result = await db.execute(select(Developer).filter(Developer.id == id))
+    dev: Developer = result.scalars().first()
+    return DeveloperDetailedResponse(id=dev.id, username=dev.username, email=dev.email,
+                                     instant_messages=dev.instant_messages, instant_thank_you=dev.instant_thank_you,
+                                     summary_frequency=dev.summary_frequency, last_summary_sent=dev.last_summary_sent)
+
 
 # ---- PROJECTS ----
 
@@ -62,7 +73,7 @@ async def create_project(db: AsyncSession, developer_id: int, project: schemas.P
     try:
         await db.commit()
         await db.refresh(new_project)
-        return new_project
+        return ProjectResponse(id=new_project.id, name=new_project.name, dev_id=new_project.developer_id)
     except IntegrityError:
         await db.rollback()
         raise HTTPException(

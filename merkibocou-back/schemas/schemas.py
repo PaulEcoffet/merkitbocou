@@ -126,12 +126,22 @@ class DeveloperResponse(BaseModel):
         from_attributes = True
 
 class DeveloperUpdatePreference(BaseModel):
-    instant_messages: Optional[bool] = Field(None, alias="instantMessages")
-    instant_thank_you: Optional[bool] = Field(None, alias="instantThankYou")
-    summary_frequency: Optional[Literal["weekly", "daily", "none"]] = Field(None, alias="summaryFrequency")  # ! "none" = pas de summary, None: pas d’update des pref
+    instant_messages: Optional[bool] = Field(None, serialization_alias="instantMessages")
+    instant_thank_you: Optional[bool] = Field(None, serialization_alias="instantThankYou")
+    summary_frequency: Optional[Literal["weekly", "daily", "none"]] = Field(None, serialization_alias="summaryFrequency")  # ! "none" = pas de summary, None: pas d’update des pref
 
-class Config:
+    class Config:
         populate_by_name = True
+
+
+class DeveloperDetailedResponse(BaseModel):
+    id: int
+    username: UserName = Field(serialization_alias="username")
+    email: EmailStr
+    instant_messages: bool = Field(serialization_alias="instantMessages")
+    instant_thank_you: bool = Field(serialization_alias="instantThankYou")
+    summary_frequency: Literal["weekly", "daily", "none"] = Field(serialization_alias="summaryFrequency")
+    last_summary_sent: datetime = Field(serialization_alias="lastSummarySent")
 
 
 # ---- PROJECTS ----

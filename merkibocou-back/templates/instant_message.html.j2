@@ -1,0 +1,17 @@
+<div class="email-container"
+    style="font-family: 'Nunito Sans', Arial, sans-serif;background-color: #fff8dc;color: #4b0082;margin: 0;padding: 0;line-height: 1.6;max-width: 600px;margin: 0 auto;background: #ffffff;border: 1px solid #ffcccb;border-radius: 8px;padding: 20px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <h1 style="font-family: 'Chewy', cursive, Arial, sans-serif;color: #ff6f61;">Nouveau message pour {{ username }}</h1>
+    <p style="margin: 0 0 1rem;">Tu as reçu un message :)</p>
+    <h2 style="font-family: 'Chewy', cursive, Arial, sans-serif;color: #ff6f61;margin-bottom: 10px;">{{ project }}</h2>
+    <h3 style="font-family: 'Chewy', cursive, Arial, sans-serif;color: #ff6f61;">Message :</h3>
+    <p class="message" style="margin: 0; padding: 15px; background-color: #ffffff; border-radius: 4px;">
+        {{ message.content }}
+    </p>
+    <p style="margin-top: 0; margin-bottom: 20px; color: #aaa">
+        Par : {{ message.user_id }}, le : {{ message.timestamp }}
+    </p>
+</div>
+<p style="margin: 0 0 1rem;">Et voilà c’est tout! Gros bisous et à bientôt!</p>
+<div class="footer" style="text-align: center;font-size: 0.9rem;color: #666;margin-top: 20px;">
+    2024 MerkitBocou par <em>peco</em>
+</div>
